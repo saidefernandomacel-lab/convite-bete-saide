@@ -549,13 +549,17 @@
       <label class="caps eyebrow" for="rsvp-preview">Mensagem para os noivos</label>
       <textarea id="rsvp-preview" readonly></textarea>
       <div class="actions">
-        <a class="btn wa" id="wa-link" href="https://wa.me/" target="_blank" rel="noopener">
+        <a class="btn wa" id="wa-saide" href="https://wa.me/" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3c-.2.3-.9.9-.9 2.2s1 2.6 1.1 2.7c.1.2 1.9 2.9 4.6 4 1.7.7 2.4.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.5-.3z"/></svg>
-          Enviar pelo WhatsApp
+          Enviar ao Saíde
+        </a>
+        <a class="btn wa" id="wa-bete" href="https://wa.me/" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3c-.2.3-.9.9-.9 2.2s1 2.6 1.1 2.7c.1.2 1.9 2.9 4.6 4 1.7.7 2.4.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.5-.3z"/></svg>
+          Enviar à Bete
         </a>
         <button class="btn ghost" type="button" id="copy-btn">Copiar mensagem</button>
       </div>
-      <p class="muted" id="wa-note"></p>
+      <p class="muted" id="wa-note">Basta enviar a um dos noivos: Saíde (+258 866 788 158) ou Bete (+258 840 377 261).</p>
       <p class="status" id="copy-status" aria-live="polite"></p>
 
       <div class="pass-wrap" id="pass-wrap" hidden>
@@ -601,9 +605,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
 (function () {
-  // Número de WhatsApp dos noivos em formato internacional, sem "+" nem espaços (ex.: 258841234567).
-  // Vazio: o WhatsApp abre e o convidado escolhe o contacto.
-  var WHATSAPP_NUMBER = "";
+  // Números de WhatsApp dos noivos, em formato internacional sem "+" nem espaços.
+  var WHATSAPP = { saide: "258866788158", bete: "258840377261" };
 
   var root = document.documentElement;
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -719,8 +722,6 @@
   var errorEl = document.getElementById('rsvp-error');
   var result = document.getElementById('rsvp-result');
   var preview = document.getElementById('rsvp-preview');
-  var waLink = document.getElementById('wa-link');
-  var waNote = document.getElementById('wa-note');
   var copyStatus = document.getElementById('copy-status');
   var companionEl = document.getElementById('rsvp-companion');
   var companionField = document.getElementById('companion-field');
@@ -973,10 +974,8 @@
     if (vai === 'sim') showPass(names, code);
     else { passWrap.hidden = true; currentPass = null; }
     preview.value = text;
-    waLink.href = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(text);
-    waNote.textContent = WHATSAPP_NUMBER
-      ? 'O WhatsApp abre com a mensagem já endereçada aos noivos. Só tem de carregar em enviar.'
-      : 'O WhatsApp abre com a mensagem escrita. Escolha o contacto dos noivos e carregue em enviar.';
+    document.getElementById('wa-saide').href = 'https://wa.me/' + WHATSAPP.saide + '?text=' + encodeURIComponent(text);
+    document.getElementById('wa-bete').href = 'https://wa.me/' + WHATSAPP.bete + '?text=' + encodeURIComponent(text);
     copyStatus.textContent = '';
     form.hidden = true;
     result.hidden = false;
