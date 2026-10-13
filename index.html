@@ -459,7 +459,7 @@
         <span class="side caps">Dezembro<br>2026</span>
       </div>
       <p class="caps hour reveal" style="--i:6">Às 14h30</p>
-      <p class="hijri reveal" style="--i:6" id="hijri" hidden></p>
+      <p class="hijri reveal" style="--i:6">3 de Rajab de 1448 H (calendário hijri)</p>
       <p class="ar inshallah reveal" style="--i:7" lang="ar">إِنْ شَاءَ اللَّه</p>
 
       <div class="where reveal" style="--i:8">
@@ -663,19 +663,6 @@
   }
   document.getElementById('seal').addEventListener('click', function () { openEnvelope(false); });
   document.getElementById('skip').addEventListener('click', function () { openEnvelope(true); });
-
-  /* ---- Hijri date ---- */
-  try {
-    var parts = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
-      .formatToParts(new Date(Date.UTC(2026, 11, 12, 12)));
-    var get = function (t) { var p = parts.find(function (x) { return x.type === t; }); return p ? p.value : ''; };
-    var month = get('month');
-    if (month && !/^\d+$/.test(month)) {
-      var hijri = document.getElementById('hijri');
-      hijri.textContent = get('day') + ' de ' + month + ' de ' + get('year') + ' H (calendário hijri, aprox.)';
-      hijri.hidden = false;
-    }
-  } catch (e) { /* calendário hijri indisponível neste navegador */ }
 
   /* ---- Countdown (hora de Maputo, UTC+2) ---- */
   var target = Date.parse('2026-12-12T14:30:00+02:00');
