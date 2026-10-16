@@ -514,6 +514,7 @@
     <p class="caps eyebrow">RSVP</p>
     <h2 class="script" id="rsvp-title">Confirme a sua presença</h2>
     <p class="deadline">Por favor confirme até <strong>10 de Novembro de 2026</strong>.</p>
+    <p class="muted">Este convite é pessoal e válido para uma pessoa.</p>
     <p class="muted">Preencha abaixo e envie a resposta a um dos noivos pelo WhatsApp.</p>
 
     <form id="rsvp-form" novalidate>
@@ -530,19 +531,6 @@
         </div>
       </fieldset>
 
-      <div class="field" id="count-field">
-        <label id="count-label" for="rsvp-count">Quantas pessoas, incluindo a si? (máximo 2)</label>
-        <div class="stepper" role="group" aria-labelledby="count-label">
-          <button type="button" id="count-minus" aria-label="Menos uma pessoa">−</button>
-          <output id="rsvp-count" aria-live="polite">1</output>
-          <button type="button" id="count-plus" aria-label="Mais uma pessoa">+</button>
-        </div>
-      </div>
-
-      <div class="field" id="companion-field" hidden>
-        <label for="rsvp-companion">Nome do acompanhante</label>
-        <input type="text" id="rsvp-companion" name="acompanhante" autocomplete="off" placeholder="Ex.: Amina Abdul">
-      </div>
 
       <div class="field">
         <label for="rsvp-msg">Mensagem ou du'a para os noivos (opcional)</label>
@@ -713,46 +701,24 @@
   var form = document.getElementById('rsvp-form');
   var nameEl = document.getElementById('rsvp-name');
   var msgEl = document.getElementById('rsvp-msg');
-  var countEl = document.getElementById('rsvp-count');
-  var countField = document.getElementById('count-field');
   var errorEl = document.getElementById('rsvp-error');
   var result = document.getElementById('rsvp-result');
   var preview = document.getElementById('rsvp-preview');
   var copyStatus = document.getElementById('copy-status');
-  var companionEl = document.getElementById('rsvp-companion');
-  var companionField = document.getElementById('companion-field');
   var passWrap = document.getElementById('pass-wrap');
   var passStatus = document.getElementById('pass-status');
   var savePassBtn = document.getElementById('save-pass');
   var currentPass = null;
-  var count = 1;
   var STORE = 'convite-bete-saide-rsvp';
-
-  function setCount(n) {
-    count = Math.max(1, Math.min(2, n));
-    countEl.textContent = count;
-    document.getElementById('count-minus').disabled = count === 1;
-    document.getElementById('count-plus').disabled = count === 2;
-    syncCount();
-  }
-  document.getElementById('count-minus').addEventListener('click', function () { setCount(count - 1); });
-  document.getElementById('count-plus').addEventListener('click', function () { setCount(count + 1); });
-  setCount(1);
 
   function attending() {
     var c = form.querySelector('input[name="presenca"]:checked');
     return c ? c.value : '';
   }
-  function syncCount() {
-    var nao = attending() === 'nao';
-    countField.hidden = nao;
-    companionField.hidden = nao || count < 2;
-  }
-  form.addEventListener('change', syncCount);
 
   function save() {
     try {
-      localStorage.setItem(STORE, JSON.stringify({ nome: nameEl.value, presenca: attending(), pessoas: count, acompanhante: companionEl.value, mensagem: msgEl.value }));
+      localStorage.setItem(STORE, JSON.stringify({ nome: nameEl.value, presenca: attending(), mensagem: msgEl.value }));
     } catch (e) { /* armazenamento indisponível */ }
   }
   try {
@@ -760,15 +726,12 @@
     if (saved) {
       nameEl.value = saved.nome || '';
       msgEl.value = saved.mensagem || '';
-      companionEl.value = saved.acompanhante || '';
-      setCount(saved.pessoas || 1);
       if (saved.presenca) {
         var r = form.querySelector('input[name="presenca"][value="' + saved.presenca + '"]');
         if (r) r.checked = true;
       }
     }
   } catch (e) { /* armazenamento indisponível */ }
-  syncCount();
 
   // Código do passe: derivado dos nomes, por isso é sempre o mesmo para os mesmos convidados.
   // Os noivos conferem-no com a lista de confirmações recebidas no WhatsApp.
@@ -925,11 +888,10 @@
     });
   });
 
-  function buildMessage(nome, vai, pessoas, mensagem, acompanhante, code) {
+  function buildMessage(nome, vai, mensagem, code) {
     var lines = ['Assalamu alaikum, Bete e Saíde!', ''];
     if (vai === 'sim') {
       lines.push('Sou ' + nome + ' e confirmo com alegria a minha presença no vosso casamento, no sábado, 12 de Dezembro de 2026, às 14h30, na Av. Marginal, Godinho (Matola), Insha\'Allah.');
-      lines.push(pessoas === 1 ? 'Estarei sozinho(a): 1 pessoa.' : 'Seremos 2 pessoas: eu e ' + acompanhante + '.');
       lines.push('Código do passe de entrada: ' + code);
     } else {
       lines.push('Sou ' + nome + '. Infelizmente não poderei estar presente no vosso casamento a 12 de Dezembro de 2026, mas estarei convosco nas minhas preces.');
@@ -955,18 +917,11 @@
       document.getElementById('rsvp-yes').focus();
       return;
     }
-    var acompanhante = companionEl.value.trim();
-    if (vai === 'sim' && count === 2 && !acompanhante) {
-      errorEl.textContent = 'Escreva o nome da pessoa que o vai acompanhar.';
-      errorEl.hidden = false;
-      companionEl.focus();
-      return;
-    }
     errorEl.hidden = true;
     save();
-    var names = vai === 'sim' ? (count === 2 ? [nome, acompanhante] : [nome]) : [];
+    var names = vai === 'sim' ? [nome] : [];
     var code = vai === 'sim' ? passCode(names) : '';
-    var text = buildMessage(nome, vai, count, msgEl.value.trim(), acompanhante, code);
+    var text = buildMessage(nome, vai, msgEl.value.trim(), code);
     if (vai === 'sim') showPass(names, code);
     else { passWrap.hidden = true; currentPass = null; }
     preview.value = text;
